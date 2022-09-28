@@ -63,6 +63,29 @@ def createYcnn(noOfLayers, noOfBaseFilter, kernalSize, strides:list, dropRates:l
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=METRICS_DEF) #'sgd'. adam shall better&faster than sgd
     return model
 
+def creatNprintEnModel(string, rows, columns): #e.g. string='modelSample.png'
+    model = createYcnn(CONV_LAYERS, NB_FILTER, KERNAL_SIZE, (STRIDES_1ST, STRIDES_2ND),
+                         (DROPOUT_RATE1, DROPOUT_RATE2), POOL_SIZE, rows, columns, CHANNELS) # MUST refresh after each loop
+    model.summary(); plot_model(model, to_file=string, show_shapes=True, show_layer_names=True) #plot the model to *.png
+    return model
+
+def extractMagOrPhrase(dataset, magPhrase=hg.MAGNITUDE_M, phraseSmoothingMethod=RAW_MODE):
+    nbImages,rows,columns = dataset.shape #e.g nbImages,rows,columns=(25000, 64, 64). For later reshape
+    if magPhrase==hg.MAGNITUDE_M: dataset=np.absolute(dataset); print("Exacted Hologram Pixels Magnitudes") 
+
+    elif magPhrase==hg.PHRASE_M:
+        dataset=np.angle(dataset); print("\nExtracted Hologram Pixels Phrase-Angles.", end =' Applying..')
+        if phraseSmoothingMethod==RAW_MODE:
+            print("No phrase-smoothing")
+        elif phraseSmoothingMethod==COS_MODE:
+            print("Cos phrase-smoothing"); dataset=np.cos(dataset) #cos a bit better than sin
+            
+    else: print('Invalid Extraction Mode !. Quit the code now.'); quit()
+            
+    dataset=(dataset-dataset.min())/(dataset.max()-dataset.min()) #12oct2021, max => min-max Normalize
+    dataset=dataset.reshape((nbImages,rows,columns,CHANNELS)); dataset=dataset.astype("float32") #!! astypes will discard complex part if place before absolute(). Try single precision for speed first.
+    return dataset
+
 # =============================================================================
 # ###         Main Program start Here         ###
 # =============================================================================
