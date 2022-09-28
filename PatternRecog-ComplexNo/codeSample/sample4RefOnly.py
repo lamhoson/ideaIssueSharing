@@ -10,30 +10,29 @@ from subprocess import check_output; from multiprocessing import cpu_count # cpu
 import sys; import pandas as pd; import os
 from sklearn.metrics import confusion_matrix; import seaborn as sns; import matplotlib.pyplot as plt
 
-NB_CLASSES=len(hg.BIO_FILENAME) #6, total classes of the biological samples
 """ Common tuning network hyper-parameters """
-NB_FILTER =3 #at least 16, 32 better than 48/64 12oct2021 
-DELTA_E= 0.0001#0.0001 #0.00009 # error for training early-stop
-PATIENCE_NB=5 #10 #5
+NB_FILTER =3
+DELTA_E= 0.0001
+PATIENCE_NB=5 
 NB_EPOCHS= 1000 # use earlyStopping to stop
-SPILT_RATIO_4T=0.2  # Test Set's  ratio. e.g. 0.3=30% for test & 70% for train
-VALID_SPLIT=0.2# reserve 0.1=10% fr trainSet for validation during Training
+SPILT_RATIO_4T=0.2 
+VALID_SPLIT=0.2
 
-BATCH=32 # batch_size=BATCH, default=32. 32 means accumulate 32 uodate rounds before update the weights a round.
-CONV_LAYERS=2 #2 max already. # no of convolution layers, 2=>0,1 two layers will be created
-DROPOUT_RATE1=0.5 # at least 0.5, 0.25 no good. 12oct2021
-DROPOUT_RATE2=0.5 # at least 0.5
-STRIDES_1ST=(1,1) # pooling filter pixel move step, x= move-x-pixels per step.
-STRIDES_2ND=(2,2) # (2,2). (1,1) is obviously better 12oct2021
+BATCH=32 
+CONV_LAYERS=2 
+DROPOUT_RATE1=0.5 
+DROPOUT_RATE2=0.5 
+STRIDES_1ST=(1,1) 
+STRIDES_2ND=(2,2) 
 
 """ Non-common tuning network hyper-parameters """
 X_SILENCE=1 # 0=silence, 1=echo console
 KERNAL_SIZE =(3,3) # convolution filter kernel size 3x3.
-POOL_SIZE =(2,2) # size of pooling area for max pooling. Should be smaller than Kernal size
+POOL_SIZE =(2,2)
 CHANNELS = 1 # image channel is one for gray image
 OPTI_MODE= 'val_auc' #'val_auc' 'val_precision', 'auc'
 
-METRICS_DEF = [metrics.CategoricalAccuracy(name='acc'), #debug 17aug2021, BinaryAcc to Cat..Acc
+METRICS_DEF = [metrics.CategoricalAccuracy(name='acc'), 
                metrics.AUC(name='auc') ] #AUC=0 => model's prediction is 100% wrong, AUC=1 => prediction 100% right.
 
 def genConvDrpPooLayer(inputs, noOfLayers, noOfBaseFilter, kernalSize, strides:list, dropRates:list, poolSize ): # Conv2D-Dropout-MaxPooling2D, n times defined by CONV_LAYERS
