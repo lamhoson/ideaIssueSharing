@@ -40,10 +40,10 @@ def genConvDrpPooLayer(inputs, noOfLayers, noOfBaseFilter, kernalSize, strides:l
         inputs  = Conv2D(filters= noOfBaseFilter*(i+1), #no-of-filters doubles after each layer (e.g. 32-64...)
 				   kernel_size=kernalSize, strides=strides[i], #[0] is 1st stride size, [1] is 2nd etc.
 				   padding='same', activation='relu')(inputs)
-        inputs  = MaxPooling2D(pool_size=poolSize)(inputs) #default is (2, 2). debug output->input, 26aug2021
+        inputs  = MaxPooling2D(pool_size=poolSize)(inputs) #default is (2, 2). debug output->input
         inputs  = Dropout(dropRates[i])(inputs) #[0] is 1st dropout rate, [1] is 2nd etc.
         
-    return inputs #debug output->input, 26aug2021
+    return inputs #debug output->input
 
 def concateNsoftMax(leftInp, rightInp, dropRate): # concatenateEnsemble-softmax
     """
@@ -59,11 +59,11 @@ def concateNsoftMax(leftInp, rightInp, dropRate): # concatenateEnsemble-softmax
     """
     output = layers.concatenate([leftInp, rightInp]) # default concat at last axis e.g.(2,5)+(2,5)=>(2,10), A1
     output = Flatten()(output) # flat feature maps 
-# CAN't add Dense layer here, all will be 5 !!. Can't explain YET. 6jun2021
+# CAN't add Dense layer here, all will be 5 !!. Can't explain YET. 
     # output = Dense(NB_NEURON, activation='relu')(output)
     # output = Dropout(dropRate)(output) # output = layers.BatchNormalization()(output) #A4, worster performance and faster training
     output = Dense(NB_CLASSES,)(output)
-    output = Dropout(dropRate)(output) # better performance just before Softmax, 28aug2021
+    output = Dropout(dropRate)(output) # better performance just before Softmax, 
     output = layers.Activation('softmax')(output)           
     
     return output
